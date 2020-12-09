@@ -6,7 +6,8 @@ namespace lab2.Controllers
     {
         public IActionResult Index()
         {
-            return Ok();
+            HttpContext.Session.Clear();
+            return Redirect("/");
         }
     }
 }

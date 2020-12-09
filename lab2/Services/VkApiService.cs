@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -29,7 +30,7 @@ namespace lab2.Services
             _secret = configuration["SecretKey"];
         }
 
-        public async Task Auth(string code)
+        public async Task<User?> Auth(string code)
         {
             WebRequest request = WebRequest.CreateHttp($"https://oauth.vk.com/access_token?client_id={_appId}&client_secret={_secret}&redirect_uri={RedirectUri}&code={code}");
             string json;
@@ -39,7 +40,7 @@ namespace lab2.Services
             _accessTokenModel = accessTokenModel;
             _logger.LogInformation(_accessTokenModel?.ToString());
 
-            CurrentUser = await GetUser(accessTokenModel!.UserId!.Value);
+            return await GetUser(accessTokenModel!.UserId!.Value);
         }
 
         private async Task<User?> GetUser(int id)
@@ -52,13 +53,6 @@ namespace lab2.Services
             WebRequest request = WebRequest.CreateHttp(uriString);
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
-
-            /*using StreamReader reader = new StreamReader(stream);
-            string json = await reader.ReadToEndAsync();
-            _logger.LogInformation(json);
-
-            stream.Position = 0;*/
-
             var profileResponseInfoModel = await JsonSerializer.DeserializeAsync<ApiResponseModel<UserInfoModel>>(stream);
             
             if (profileResponseInfoModel is null)
@@ -90,7 +84,5 @@ namespace lab2.Services
         }
 
         public string GetAuthorizeUrl() => $"https://oauth.vk.com/authorize?client_id={_appId}&display=page&redirect_uri={RedirectUri}&response_type=code&v={ApiVersion}";
-
-        public User? CurrentUser { get; private set; }
     }
 }

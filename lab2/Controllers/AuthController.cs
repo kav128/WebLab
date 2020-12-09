@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using lab2.Entities;
 using lab2.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,9 +33,11 @@ namespace lab2.Controllers
             }
             
             _logger.LogInformation("Got auth code");
+
+            User? user = await _vkApiService.Auth(code);
             
-            await _vkApiService.Auth(code);
-            
+            HttpContext.Session.Set("User", user);
+
             return Redirect("/");
         }
     }

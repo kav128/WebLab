@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
+using lab2.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using lab2.Models;
@@ -25,7 +27,8 @@ namespace lab2.Controllers
         public IActionResult Index()
         {
             ViewData.Add("AuthUrl", _vkApiService.GetAuthorizeUrl());
-            return View(_vkApiService.CurrentUser);
+            var user = HttpContext.Session.Get<User>("User");
+            return View(user);
         }
 
         public IActionResult Privacy()

@@ -25,6 +25,7 @@ namespace lab2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddSession();
             services.AddSingleton<IVkApiService, VkApiService>();
         }
 
@@ -44,7 +45,9 @@ namespace lab2
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            
+            app.UseSession();
+            
             app.UseRouting();
 
             app.UseAuthorization();
