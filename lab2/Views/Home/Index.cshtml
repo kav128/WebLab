@@ -1,8 +1,17 @@
-﻿@{
+﻿@using lab2.Entities
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @if (Model is User user)
+    {
+        <h1 class="display-4">Welcome, @user.FirstName @user.LastName</h1>
+        <p><a asp-controller="Logout">Logout</a></p>
+    }
+    else 
+    {
+        <h1 class="display-4">Welcome</h1>
+        <p><a href="@ViewData["AuthUrl"]">Authenticate in VK</a></p>
+    }
 </div>

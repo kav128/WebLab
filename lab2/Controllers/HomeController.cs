@@ -6,21 +6,26 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using lab2.Models;
+using lab2.Services;
+using Microsoft.AspNetCore.Authentication;
 
 namespace lab2.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IVkApiService _vkApiService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IVkApiService vkApiService)
         {
             _logger = logger;
+            _vkApiService = vkApiService;
         }
 
         public IActionResult Index()
         {
-            return View();
+            ViewData.Add("AuthUrl", _vkApiService.GetAuthorizeUrl());
+            return View(_vkApiService.CurrentUser);
         }
 
         public IActionResult Privacy()
