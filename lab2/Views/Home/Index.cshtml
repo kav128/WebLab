@@ -6,12 +6,13 @@
 <div class="text-center">
     @if (Model is User user)
     {
-        <h1 class="display-4">Welcome, @user.FirstName @user.LastName</h1>
+        <img src="@user.ProfilePic" class="profile-pic">
+        <h1 class="display-4 greetings">Welcome, @user.FirstName @user.LastName</h1>
         <p><a asp-controller="Logout">Logout</a></p>
     }
     else 
     {
-        <h1 class="display-4">Welcome</h1>
+        <h1 class="display-4 greetings">Welcome</h1>
         <p><a href="@ViewData["AuthUrl"]">Authenticate in VK</a></p>
     }
 </div>

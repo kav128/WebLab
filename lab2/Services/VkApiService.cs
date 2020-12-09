@@ -48,7 +48,7 @@ namespace lab2.Services
             if (_accessTokenModel is null) return null;
             
             const string methodName = "users.get";
-            var uriString = $"https://api.vk.com/method/{methodName}?user_ids={id}&access_token={_accessTokenModel.AccessToken}&v={ApiVersion}";
+            var uriString = $"https://api.vk.com/method/{methodName}?user_ids={id}&fields=photo_100&access_token={_accessTokenModel.AccessToken}&v={ApiVersion}";
             _logger.LogInformation(uriString);
             WebRequest request = WebRequest.CreateHttp(uriString);
             using WebResponse response = await request.GetResponseAsync();
@@ -75,7 +75,7 @@ namespace lab2.Services
             }
 
             _logger.LogInformation(userInfoModel.ToString());
-            return new User(userInfoModel.FirstName, userInfoModel.LastName);
+            return new User(userInfoModel.FirstName, userInfoModel.LastName) { ProfilePic = userInfoModel.ProfilePic100 };
         }
 
         public void Logout()

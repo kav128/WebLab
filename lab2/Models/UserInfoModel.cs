@@ -10,6 +10,9 @@ namespace lab2.Models
 
         [JsonPropertyName("last_name")]
         public string LastName { get; set; }
+
+        [JsonPropertyName("photo_100")]
+        public string ProfilePic100 { get; set; }
     }
     
     public record ApiResponseModel<TModel>
