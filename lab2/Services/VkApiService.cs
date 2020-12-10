@@ -38,8 +38,15 @@ namespace lab2.Services
 
         public async Task<User?> Auth(string code)
         {
-            WebRequest request = WebRequest.CreateHttp($"https://oauth.vk.com/access_token?client_id={_appId}&client_secret={_secret}&redirect_uri={_redirectUri}&code={code}");
-            string json;
+            UriBuilder builder = new()
+            {
+                Scheme = "https",
+                Host = "oauth.vk.com",
+                Path = "access_token",
+                Query = $"client_id={_appId}&client_secret={_secret}&redirect_uri={_redirectUri}&code={code}"
+            };
+            
+            WebRequest request = WebRequest.CreateHttp(builder.ToString());
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
             var accessTokenModel = await JsonSerializer.DeserializeAsync<AccessTokenModel>(stream);
@@ -54,9 +61,15 @@ namespace lab2.Services
             if (_accessTokenModel is null) return null;
             
             const string methodName = "users.get";
-            var uriString = $"https://api.vk.com/method/{methodName}?user_ids={id}&fields=photo_100&access_token={_accessTokenModel.AccessToken}&v={ApiVersion}";
-            _logger.LogInformation(uriString);
-            WebRequest request = WebRequest.CreateHttp(uriString);
+            UriBuilder builder = new()
+            {
+                Scheme = "https",
+                Host = "api.vk.com",
+                Path = $"method/{methodName}",
+                Query = $"user_ids={id}&fields=photo_100&access_token={_accessTokenModel.AccessToken}&v={ApiVersion}"
+            };
+            
+            WebRequest request = WebRequest.CreateHttp(builder.ToString());
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
             var profileResponseInfoModel = await JsonSerializer.DeserializeAsync<ApiResponseModel<UserInfoModel>>(stream);
@@ -84,11 +97,13 @@ namespace lab2.Services
             return new User(userInfoModel.FirstName, userInfoModel.LastName) { ProfilePic = userInfoModel.ProfilePic100 };
         }
 
-        public void Logout()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public string GetAuthorizeUrl() => $"https://oauth.vk.com/authorize?client_id={_appId}&display=page&redirect_uri={_redirectUri}&response_type=code&v={ApiVersion}";
+        public string GetAuthorizeUrl() =>
+            new UriBuilder
+            {
+                Scheme = "https",
+                Host = "oauth.vk.com",
+                Path = "authorize",
+                Query = $"client_id={_appId}&display=page&redirect_uri={_redirectUri}&response_type=code&v={ApiVersion}"
+            }.ToString();
     }
 }
