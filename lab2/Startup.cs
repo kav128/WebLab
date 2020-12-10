@@ -43,7 +43,6 @@ namespace lab2
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             
             app.UseSession();
