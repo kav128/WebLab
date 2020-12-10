@@ -1,3 +1,4 @@
+#nullable disable
 namespace lab2.Models
 {
     public class VkErrorModel

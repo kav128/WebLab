@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+#nullable disable
 using System.Text.Json.Serialization;
 
 namespace lab2.Models
@@ -13,14 +13,5 @@ namespace lab2.Models
 
         [JsonPropertyName("photo_100")]
         public string ProfilePic100 { get; set; }
-    }
-    
-    public record ApiResponseModel<TModel>
-    {
-        [JsonPropertyName("response")]
-        public ICollection<TModel>? Response { get; set; }
-
-        [JsonPropertyName("error")]
-        public Error? Error { get; set; }
     }
 }
