@@ -19,7 +19,7 @@ namespace lab2.Services
         private readonly string _appId;
         private readonly string _secret;
         private AccessTokenModel? _accessTokenModel;
-        private const string RedirectUri = "https://localhost:5001/Auth";
+        private readonly string _redirectUri;
         private const string ApiVersion = "5.126";
 
         public VkApiService(ILogger<VkApiService> logger, IConfiguration configuration)
@@ -28,11 +28,17 @@ namespace lab2.Services
 
             _appId = configuration["ApplicationId"];
             _secret = configuration["SecretKey"];
+
+            string protocol = configuration["AppProtocol"];
+            string domain = configuration["AppDomain"];
+            int port = int.Parse(configuration["AppPort"]);
+            var uriBuilder = new UriBuilder { Scheme = protocol, Host = domain, Path = "Auth", Port = port };
+            _redirectUri = uriBuilder.ToString();
         }
 
         public async Task<User?> Auth(string code)
         {
-            WebRequest request = WebRequest.CreateHttp($"https://oauth.vk.com/access_token?client_id={_appId}&client_secret={_secret}&redirect_uri={RedirectUri}&code={code}");
+            WebRequest request = WebRequest.CreateHttp($"https://oauth.vk.com/access_token?client_id={_appId}&client_secret={_secret}&redirect_uri={_redirectUri}&code={code}");
             string json;
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
@@ -83,6 +89,6 @@ namespace lab2.Services
             throw new System.NotImplementedException();
         }
 
-        public string GetAuthorizeUrl() => $"https://oauth.vk.com/authorize?client_id={_appId}&display=page&redirect_uri={RedirectUri}&response_type=code&v={ApiVersion}";
+        public string GetAuthorizeUrl() => $"https://oauth.vk.com/authorize?client_id={_appId}&display=page&redirect_uri={_redirectUri}&response_type=code&v={ApiVersion}";
     }
 }
