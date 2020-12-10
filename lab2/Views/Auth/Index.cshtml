@@ -1,0 +1,13 @@
+@model lab2.Models.VkErrorModel
+
+@{
+    ViewData["Title"] = "VK Authorization";
+}
+
+<div class="center-block">
+    <div class="error">
+        <p class="error-header">@Model.ExceptionType</p>
+        <p class="error-description">@Model.Message</p>
+    </div>
+    <a asp-controller="Home" class="">Go back</a>    
+</div>

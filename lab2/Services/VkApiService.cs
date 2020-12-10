@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using lab2.Entities;
+using lab2.Exceptions;
 using lab2.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -36,7 +38,7 @@ namespace lab2.Services
             _redirectUri = uriBuilder.ToString();
         }
 
-        public async Task<User?> Auth(string code)
+        public async Task<User> Auth(string code)
         {
             UriBuilder builder = new()
             {
@@ -50,15 +52,27 @@ namespace lab2.Services
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
             var accessTokenModel = await JsonSerializer.DeserializeAsync<AccessTokenModel>(stream);
+            if (accessTokenModel is null)
+            {
+                _logger.LogError("Cannot get access token data");
+                throw new UnexpectedErrorException("Error while reading API response body.");
+            }
+
+            if (accessTokenModel.Error is not null)
+            {
+                _logger.LogWarning("Got error while authorization.");
+                throw new VkApiException($"Cannot authorize: got error '{accessTokenModel.Error}' with description '{accessTokenModel.ErrorDescription}'");
+            }
+
             _accessTokenModel = accessTokenModel;
             _logger.LogInformation(_accessTokenModel?.ToString());
-
-            return await GetUser(accessTokenModel!.UserId!.Value);
+            return await GetUser(accessTokenModel.UserId!.Value);
         }
-
-        private async Task<User?> GetUser(int id)
+        
+        private async Task<User> GetUser(int id)
         {
-            if (_accessTokenModel is null) return null;
+            if (_accessTokenModel is null)
+                throw new VkNotAuthorizedException("Trying to get user data without being authorized in VK");
             
             const string methodName = "users.get";
             UriBuilder builder = new()
@@ -77,20 +91,20 @@ namespace lab2.Services
             if (profileResponseInfoModel is null)
             {
                 _logger.LogError("Cannot get profile info");
-                return null;
+                throw new UnexpectedErrorException("Error while reading API response body.");
             }
 
             if (profileResponseInfoModel.Response is null)
             {
                 _logger.LogWarning($"Got error {profileResponseInfoModel.Error}");
-                return null;
+                throw new VkApiException($"VK API returned error with code {profileResponseInfoModel.Error?.ErrorCode} and description: '{profileResponseInfoModel.Error?.ErrorMessage}'.");
             }
 
             UserInfoModel? userInfoModel = profileResponseInfoModel.Response.FirstOrDefault();
             if (userInfoModel is null)
             {
                 _logger.LogError("Couldn't get user from result set");
-                return null;
+                throw new UnexpectedErrorException("VK API returned empty users list.");
             }
 
             _logger.LogInformation(userInfoModel.ToString());

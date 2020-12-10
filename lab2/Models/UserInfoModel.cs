@@ -21,6 +21,6 @@ namespace lab2.Models
         public ICollection<TModel>? Response { get; set; }
 
         [JsonPropertyName("error")]
-        public string Error { get; set; }
+        public Error? Error { get; set; }
     }
 }
