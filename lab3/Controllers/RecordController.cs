@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 namespace lab3.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("")]
     public class RecordController : ControllerBase
     {
         private readonly ILogger<RecordController> _logger;
