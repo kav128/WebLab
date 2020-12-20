@@ -19,7 +19,13 @@ namespace lab2.Controllers
             _vkApiService = vkApiService;
         }
 
-        // GET
+        public IActionResult Vk()
+        {
+            string url = _vkApiService.GetAuthorizeUrl();
+            _logger.LogInformation($"Redirecting to {url}");
+            return Redirect(url);
+        }
+
         public async Task<IActionResult> Index(string? code, string? error, [FromQuery(Name = "error_description")] string? errorDescription)
         {
             if (error is not null || errorDescription is not null)

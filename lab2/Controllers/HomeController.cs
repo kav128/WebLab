@@ -16,17 +16,14 @@ namespace lab2.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IVkApiService _vkApiService;
 
-        public HomeController(ILogger<HomeController> logger, IVkApiService vkApiService)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _vkApiService = vkApiService;
         }
 
         public IActionResult Index()
         {
-            ViewData.Add("AuthUrl", _vkApiService.GetAuthorizeUrl());
             var user = HttpContext.Session.Get<User>("User");
             return View(user);
         }
