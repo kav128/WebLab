@@ -11,17 +11,19 @@ namespace lab2.Controllers
     public class AuthController : Controller
     {
         private readonly ILogger<AuthController> _logger;
+        private readonly IVkAuthService _vkAuthService;
         private readonly IVkApiService _vkApiService;
 
-        public AuthController(ILogger<AuthController> logger, IVkApiService vkApiService)
+        public AuthController(ILogger<AuthController> logger, IVkAuthService vkAuthService, IVkApiService vkApiService)
         {
             _logger = logger;
+            _vkAuthService = vkAuthService;
             _vkApiService = vkApiService;
         }
 
         public IActionResult Vk()
         {
-            string url = _vkApiService.GetAuthorizeUrl();
+            string url = _vkAuthService.AuthorizeUrl;
             _logger.LogInformation($"Redirecting to {url}");
             return Redirect(url);
         }
@@ -46,8 +48,10 @@ namespace lab2.Controllers
 
             try
             {
-                User user = await _vkApiService.Auth(code);
-
+                AccessTokenData accessToken = await _vkAuthService.Auth(code);
+                HttpContext.Session.Set("AccessToken", accessToken);
+                
+                User user = await _vkApiService.GetUser(accessToken.UserId, accessToken.AccessToken);
                 HttpContext.Session.Set("User", user);
             }
             catch (Exception e)

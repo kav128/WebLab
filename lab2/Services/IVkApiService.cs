@@ -5,8 +5,6 @@ namespace lab2.Services
 {
     public interface IVkApiService
     {
-        public Task<User> Auth(string code);
-
-        public string GetAuthorizeUrl();
+        Task<User> GetUser(int id, string accessCode);
     }
 }

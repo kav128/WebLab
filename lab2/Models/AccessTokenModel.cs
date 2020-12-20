@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace lab2.Models
 {
-    public record AccessTokenModel
+    internal record AccessTokenModel
     {
         [JsonPropertyName("access_token")]
         public string? AccessToken { get; set; }

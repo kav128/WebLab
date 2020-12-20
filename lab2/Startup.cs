@@ -21,7 +21,8 @@ namespace lab2
         {
             services.AddControllersWithViews();
             services.AddSession();
-            services.AddSingleton<IVkApiService, VkApiService>();
+            services.AddSingleton<IVkAuthService, VkAuthService>();
+            services.AddTransient<IVkApiService, VkApiService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,8 +44,6 @@ namespace lab2
             app.UseSession();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
