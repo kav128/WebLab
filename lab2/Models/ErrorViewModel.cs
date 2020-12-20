@@ -1,6 +1,4 @@
 #nullable disable
-using System;
-
 namespace lab2.Models
 {
     public class ErrorViewModel

@@ -41,13 +41,13 @@ namespace lab2.Controllers
                 var model = new VkErrorModel { ExceptionType = "Bad query", Message = "Authentication code is null" };
                 return View(model);
             }
-            
+
             _logger.LogInformation("Got auth code");
 
             try
             {
                 User user = await _vkApiService.Auth(code);
-            
+
                 HttpContext.Session.Set("User", user);
             }
             catch (Exception e)

@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
@@ -11,11 +10,11 @@ namespace lab2
         {
             string jsonString = JsonSerializer.Serialize(value);
             byte[] bytes = Encoding.Default.GetBytes(jsonString);
-            
+
             session.Set(key, bytes);
         }
 
-        public static T? Get<T>(this ISession session, string key) where  T : class
+        public static T? Get<T>(this ISession session, string key) where T : class
         {
             byte[] bytes = session.Get(key);
 

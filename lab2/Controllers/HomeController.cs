@@ -1,15 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Threading.Tasks;
 using lab2.Entities;
+using lab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using lab2.Models;
-using lab2.Services;
-using Microsoft.AspNetCore.Authentication;
 
 namespace lab2.Controllers
 {

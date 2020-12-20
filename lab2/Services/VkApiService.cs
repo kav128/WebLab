@@ -12,14 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace lab2.Services
 {
-    class VkApiService : IVkApiService
+    public class VkApiService : IVkApiService
     {
-        private readonly ILogger<VkApiService> _logger;
+        private const string ApiVersion = "5.126";
         private readonly string _appId;
+        private readonly ILogger<VkApiService> _logger;
+        private readonly string _redirectUri;
         private readonly string _secret;
         private AccessTokenModel? _accessTokenModel;
-        private readonly string _redirectUri;
-        private const string ApiVersion = "5.126";
 
         public VkApiService(ILogger<VkApiService> logger, IConfiguration configuration)
         {
@@ -44,7 +44,7 @@ namespace lab2.Services
                 Path = "access_token",
                 Query = $"client_id={_appId}&client_secret={_secret}&redirect_uri={_redirectUri}&code={code}"
             };
-            
+
             WebRequest request = WebRequest.CreateHttp(builder.ToString());
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
@@ -65,12 +65,21 @@ namespace lab2.Services
             _logger.LogInformation(_accessTokenModel?.ToString());
             return await GetUser(accessTokenModel.UserId!.Value);
         }
-        
+
+        public string GetAuthorizeUrl() =>
+            new UriBuilder
+            {
+                Scheme = "https",
+                Host = "oauth.vk.com",
+                Path = "authorize",
+                Query = $"client_id={_appId}&display=page&redirect_uri={_redirectUri}&response_type=code&v={ApiVersion}"
+            }.ToString();
+
         private async Task<User> GetUser(int id)
         {
             if (_accessTokenModel is null)
                 throw new VkNotAuthorizedException("Trying to get user data without being authorized in VK");
-            
+
             const string methodName = "users.get";
             UriBuilder builder = new()
             {
@@ -79,7 +88,7 @@ namespace lab2.Services
                 Path = $"method/{methodName}",
                 Query = $"user_ids={id}&fields=photo_100&access_token={_accessTokenModel.AccessToken}&v={ApiVersion}"
             };
-            
+
             WebRequest request = WebRequest.CreateHttp(builder.ToString());
             using WebResponse response = await request.GetResponseAsync();
             await using Stream stream = response.GetResponseStream();
@@ -107,14 +116,5 @@ namespace lab2.Services
             _logger.LogInformation(userInfoModel.ToString());
             return new User(userInfoModel.FirstName, userInfoModel.LastName) { ProfilePic = userInfoModel.ProfilePic100 };
         }
-
-        public string GetAuthorizeUrl() =>
-            new UriBuilder
-            {
-                Scheme = "https",
-                Host = "oauth.vk.com",
-                Path = "authorize",
-                Query = $"client_id={_appId}&display=page&redirect_uri={_redirectUri}&response_type=code&v={ApiVersion}"
-            }.ToString();
     }
 }
